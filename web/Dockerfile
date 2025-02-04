@@ -2,8 +2,8 @@ FROM php:8.2.5-apache
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-RUN sudo apt update 
-RUN sudo apt install libpq-dev git zip -y
+RUN apt update 
+RUN apt install libpq-dev git zip -y
 RUN docker-php-ext-install pdo_pgsql
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 
