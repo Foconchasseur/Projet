@@ -1,0 +1,17 @@
+<h1>Les conflits étudiants</h1>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Numéro étudiant</th>
+        <th>Année</th>
+        <th>Entreprise</th>
+    </tr>
+    </thead>
+    {% for contrat in contrats %}
+        <tr>
+            <td>{{ contrat['no_etu'] }}</td>
+            <td>{{ contrat['annee'] }}</td>
+            <td>{{ contrat['entreprise'] }}</td>
+        </tr>
+    {% endfor %}
+</table>

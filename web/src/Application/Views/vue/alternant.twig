@@ -1,0 +1,15 @@
+<h1>Les alternants</h1>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Numéro étudiant</th>
+        <th>Nationalité</th>
+    </tr>
+    </thead>
+    {% for alternant in alternants %}
+        <tr>
+            <td>{{ alternant['no_etu'] }}</td>
+            <td>{{ alternant['nationalite'] }}</td>
+        </tr>
+    {% endfor %}
+</table>

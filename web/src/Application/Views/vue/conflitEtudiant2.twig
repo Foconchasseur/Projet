@@ -1,0 +1,21 @@
+<h1>Les étudiants ayant eu 2 fin anticipées</h1>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Numéro étudiant</th>
+        <th>Année 1</th>
+        <th>Entreprise 1</th>
+        <th>Année 2</th>
+        <th>Entreprise 2</th>
+    </tr>
+    </thead>
+    {% for conflit in conflits %}
+        <tr>
+            <td>{{ conflit['no_etu'] }}</td>
+            <td>{{ conflit['anneeconflit1'] }}</td>
+            <td>{{ conflit['nomentp1'] }}</td>
+            <td>{{ conflit['anneeconflit2'] }}</td>
+            <td>{{ conflit['nomentp2'] }}</td>
+        </tr>
+    {% endfor %}
+</table>

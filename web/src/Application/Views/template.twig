@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
+    <script src="/js/adminlte.min.js"></script>
+    <link rel="stylesheet" href="/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.17.0/tabler-icons.min.css"/>
+    <link rel="stylesheet" href="/css/toastr.min.css">
+    <link rel="stylesheet" href="/debugbar.css"/>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="/js/toastr.min.js"></script>
+    <script src="/debugbar.js"></script>
+    <link rel="icon" type="image/png" href="/picture/logo.png"/>
+
+    {{ debugbar_head|raw }}
+    <title>{% block title %}{% endblock %} - Netyparneo</title>
+    {% block head %}{% endblock %}
+</head>
+<body class="sidebar-mini">
+    <header>
+        {{ include('header.twig') }}
+    </header>
+
+    {{ include('sidebar.twig') }}
+
+    <main class="p-3 content-wrapper">
+        {% block content %}{% endblock %}
+    </main>
+    {{ debugbar_body|raw }}
+    {% if session['error'] != null %}
+        <script>toastr.error('{{ session['error'] }}')</script>
+    {% endif %}
+    {% if session['success'] != null %}
+        <script>toastr.success('{{ session['success'] }}')</script>
+    {% endif %}
+    <footer class="p-2 bg-black pt-0 mt-0">
+        <ul class="nav justify-content-center border-bottom border-secondary pb-3 mb-3">
+            <li>
+                <a href="/" class="text-muted text-secondary border-right border-secondary pr-1">Home</a>
+                <a href="/aboutus" class="text-muted text-secondary">About us</a>
+            </li>
+        </ul>
+        <p class="text-center">© 2023 Copyright : e926neo Corporation</p>
+    </footer>
+</body>
+</html>

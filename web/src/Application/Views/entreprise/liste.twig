@@ -1,0 +1,408 @@
+{% extends "template.twig" %}
+{% block head %}
+    <script>
+        function onContentLoaded(event) {
+            document.querySelector('#add-btn').addEventListener('click', () => $('#add-modal').modal('show'));
+            document.querySelectorAll('.delete-btn').forEach(element => element.addEventListener('click', onDeleteClick));
+            document.querySelector('#add-pays').addEventListener('change', onAddSelectPaysUpdate);
+            document.querySelector('#add-ville').addEventListener('change', onAddSelectVilleUpdate);
+            document.querySelector('#form-add').addEventListener('submit', onAddFormSubmit);
+            onAddSelectPaysUpdate();
+            onAddSelectVilleUpdate();
+
+            document.querySelectorAll('.update-btn').forEach(element => element.addEventListener('click', onUpdateButtonClick));
+            document.querySelector('#update-pays').addEventListener('change', onUpdateSelectPaysUpdate);
+            document.querySelector('#update-ville').addEventListener('change', onUpdateSelectVilleUpdate);
+            document.querySelector('#form-update').addEventListener('submit', onUpdateFormSubmit);
+
+            // document.querySelectorAll('.update-btn').forEach(element => element.addEventListener('click', onUpdateClick));
+        }
+
+        function onDeleteClick(event) {
+            let nom = event.target.dataset.nom
+            if (nom === undefined) nom = event.target.parentElement.dataset.nom
+            let url = "entreprise/delete?nom=" + encodeURI(nom);
+            fetch(url, {method: "GET",})
+                .then((response) => response.json())
+                .then((data) => {
+                    switch (data['error']) {
+                        case true:
+                            toastr.error("erreur: " + data['message']);
+                            break;
+                        case false:
+                            document.location.reload();
+                            break;
+                    }
+                })
+                .catch((err) => toastr.error("Une erreur est survenue lors de la suppression de l'entreprise"));
+        }
+
+        function getVilles(pays){
+            const url = "/sites/villes";
+            return fetch(`${url}?pays=` + encodeURI(pays), {method: "GET",})
+                .then((response) => response.json());
+        }
+
+        function getAdresses(pays, ville){
+            const url = "/sites/adresses";
+            return fetch(url + "?pays=" + encodeURI(pays) + "&ville=" + encodeURI(ville), {method: "GET",})
+                .then((response) => response.json())
+        }
+
+        function onAddSelectPaysUpdate(event) {
+            const selectPays = document.querySelector('#add-pays');
+            const selectVille = document.querySelector('#add-ville');
+            const selectAdresse = document.querySelector('#add-adresse');
+            const url = "/sites/villes";
+
+            if (!selectPays.value) {
+                selectVille.setAttribute('disabled', 'true');
+                selectVille.innerHTML = "<option value=''>Choisir d'abord le pays</option>";
+                selectAdresse.setAttribute('disabled', 'true');
+                selectAdresse.innerHTML = "<option value=''>Choisir d'abord la ville</option>";
+            } else {
+                getVilles(selectPays.value).then((data) => {
+                        if (data['error']) {
+                            toastr.error(data['message']);
+                            return;
+                        }
+                        selectVille.innerHTML = "<option value>Choisir la ville</option>";
+                        data['villes'].forEach(ville => {
+                            selectVille.innerHTML += `<option value="${ville}">${ville}</option>`
+                        });
+
+                        selectVille.removeAttribute('disabled')
+                        selectAdresse.setAttribute('disabled', 'true');
+                        selectAdresse.innerHTML = "<option value=''>Choisir d'abord la ville</option>";
+                    }).catch((err) => {
+                    toastr.error("Une erreur est survenue")
+                });
+            }
+        }
+
+        function onAddSelectVilleUpdate(event) {
+            const selectPays = document.querySelector('#add-pays');
+            const selectVille = document.querySelector('#add-ville');
+            const selectAdresse = document.querySelector('#add-adresse');
+
+            if (!selectPays.value || !selectVille.value) {
+                selectAdresse.setAttribute('disabled', 'true');
+                selectAdresse.innerHTML = "<option value=''>Choisir d'abord la ville</option>";
+            } else {
+                getAdresses(selectPays.value, selectVille.value)
+                    .then((data) => {
+                        if (data['error']) {
+                            toastr.error(data['message']);
+                            return;
+                        }
+                        selectAdresse.innerHTML = "<option value>Choisir l'adresse</option>";
+                        data['adresses'].forEach(adresse => {
+                            selectAdresse.innerHTML += `<option value="${adresse}">${adresse}</option>`
+                        });
+                        selectAdresse.removeAttribute('disabled')
+                    }).catch((err) => {
+                    toastr.error("Une erreur est survenue")
+                });
+            }
+        }
+
+        function onAddFormSubmit(event) {
+            event.preventDefault();
+
+            const form = document.querySelector('#form-add');
+            const url = "/entreprise/add";
+            const ouvert = document.querySelector('#add-ouvert').checked;
+
+            let params = new URLSearchParams(new FormData(form))
+            params.set('ouvert', ouvert);
+
+            fetch(
+                url,
+                {
+                    method: "POST",
+                    body: params
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data['error']) {
+                        toastr.error(data['message'] ?? "Une erreur est survenue");
+                    } else {
+                        window.location.reload();
+                    }
+
+                }).catch((err) => {
+                toastr.error("Une erreur est survenue lors de l'enregistrement de l'entreprise")
+            });
+        }
+
+        async function onUpdateButtonClick(event) {
+            let entreprise = event.target.dataset.entreprise;
+            if (entreprise === undefined) entreprise = event.target.parentNode.dataset.entreprise;
+            entreprise = JSON.parse(entreprise);
+
+            document.querySelector('#update-nom-old').value = entreprise.nom;
+            document.querySelector('#update-nom').value = entreprise.nom;
+            document.querySelector('#update-pays').value = entreprise.pays_siege;
+            await onUpdateSelectPaysUpdate();
+            document.querySelector('#update-ville').value = entreprise.ville_siege;
+            await onUpdateSelectVilleUpdate();
+            document.querySelector('#update-adresse').value = entreprise.adresse_siege;
+            $('#update-modal').modal('show')
+            document.querySelector('#update-nb-employe').value = entreprise.nb_employe
+        }
+
+        async function onUpdateSelectPaysUpdate(event) {
+            const selectPays = document.querySelector('#update-pays');
+            const selectVille = document.querySelector('#update-ville');
+            const selectAdresse = document.querySelector('#update-adresse');
+            const url = "/sites/villes";
+
+            if (!selectPays.value) {
+                selectVille.setAttribute('disabled', 'true');
+                selectVille.innerHTML = "<option value=''>Choisir d'abord le pays</option>";
+                selectAdresse.setAttribute('disabled', 'true');
+                selectAdresse.innerHTML = "<option value=''>Choisir d'abord la ville</option>";
+            } else {
+                await getVilles(selectPays.value).then((data) => {
+                    if (data['error']) {
+                        toastr.error(data['message']);
+                        return;
+                    }
+                    selectVille.innerHTML = "<option value>Choisir la ville</option>";
+                    data['villes'].forEach(ville => {
+                        selectVille.innerHTML += `<option value="${ville}">${ville}</option>`
+                    });
+
+                    selectVille.removeAttribute('disabled')
+                    selectAdresse.setAttribute('disabled', 'true');
+                    selectAdresse.innerHTML = "<option value=''>Choisir d'abord la ville</option>";
+                }).catch((err) => {
+                    toastr.error("Une erreur est survenue")
+                });
+            }
+        }
+
+        async function onUpdateSelectVilleUpdate(event) {
+            const selectPays = document.querySelector('#update-pays');
+            const selectVille = document.querySelector('#update-ville');
+            const selectAdresse = document.querySelector('#update-adresse');
+
+            if (!selectPays.value || !selectVille.value) {
+                selectAdresse.setAttribute('disabled', 'true');
+                selectAdresse.innerHTML = "<option value=''>Choisir d'abord la ville</option>";
+            } else {
+                await getAdresses(selectPays.value, selectVille.value)
+                    .then((data) => {
+                        if (data['error']) {
+                            toastr.error(data['message']);
+                            return;
+                        }
+                        selectAdresse.innerHTML = "<option value>Choisir l'adresse</option>";
+                        data['adresses'].forEach(adresse => {
+                            selectAdresse.innerHTML += `<option value="${adresse}">${adresse}</option>`
+                        });
+                        selectAdresse.removeAttribute('disabled')
+                    }).catch((err) => {
+                        toastr.error("Une erreur est survenue")
+                    });
+            }
+        }
+
+        function onUpdateFormSubmit(event){
+            event.preventDefault();
+
+            const form = document.querySelector('#form-update');
+            const url = "/entreprise/update";
+            const ouvert = document.querySelector('#update-ouvert').checked;
+            const old_nom_input = document.querySelector('#update-nom-old');
+
+            old_nom_input.removeAttribute('disabled');
+            let params = new URLSearchParams(new FormData(form))
+            params.set('ouvert', ouvert);
+            old_nom_input.setAttribute('disabled', '');
+
+            fetch(
+                url,
+                {
+                    method: "POST",
+                    body: params
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data['error']) {
+                        toastr.error(data['message'] ?? "Une erreur est survenue");
+                    } else {
+                        window.location.reload();
+                    }
+
+                }).catch((err) => {
+                toastr.error("Une erreur est survenue lors de l'enregistrement de l'entreprise")
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', onContentLoaded);
+    </script>
+{% endblock %}
+
+{% block title %}Laboratoire{% endblock %}
+
+{% block content %}
+    <div class="container" style="max-width: 100%">
+        <div class="row">
+            <div class="col"><h2>Les entreprises partenaires</h2></div>
+            <div class="col text-right">
+                <button class="btn btn-success" id="add-btn"><i class="ti ti-plus"></i></button>
+            </div>
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nom</th>
+            <th colspan="3">Siège</th>
+            <th>Nombre d'employés</th>
+            <th>Statut</th>
+            <th></th>
+        </tr>
+        </thead>
+        {% for entreprise in entreprises %}
+            <tr>
+                <td>{{ entreprise.getNom() }}</td>
+                <td>{{ entreprise.getSiege().getPays() }}</td>
+                <td>{{ entreprise.getSiege().getVille }}</td>
+                <td>{{ entreprise.getSiege().getAdresse() }}</td>
+                <td>{{ entreprise.getNbEmploye }}</td>
+                <td>{{ entreprise.isOuvert() ? "Ouvert" : "Fermé" }}</td>
+                <td class="text-right">
+                    <button class="btn btn-danger delete-btn" data-nom="{{ entreprise.getNom }}">
+                        <i class="ti ti-trash"></i>
+                    </button>
+                    <button class="btn btn-info update-btn" data-entreprise="{{ entreprise.toJson() }}">
+                        <i class="ti ti-pencil"></i>
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <div class="modal" tabindex="-1" role="dialog" id="add-modal">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <form class="modal-content" id="form-add">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter une entreprise</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label for="add-nom">Nom</label>
+                            <input id="add-nom" name="nom" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="add-pays">Pays</label>
+                        <select id="add-pays" name="pays" class="form-control" required>
+                            <option value selected>Choisir un pays</option>
+                            {% for pay in pays %}
+                                <option value="{{ pay }}">{{ pay }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="add-ville">Ville</label>
+                        <select id="add-ville" name="ville" class="form-control" disabled required>
+                            <option value="">Choisir d'abord le pays</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="add-adresse">Adresse</label>
+                        <select id="add-adresse" name="adresse" class="form-control" disabled required>
+                            <option value="">Choisir d'abord la ville</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label for="add-nb-employe">Nombre d'employés</label>
+                            <input id="add-nb-employe" name="nb_employe" class="form-control" type="number" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="add-ouvert" name="ouvert" checked>
+                            <label class="custom-control-label" for="add-ouvert">Ouvert</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" role="dialog" id="update-modal">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <form class="modal-content" id="form-update">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modifier une entreprise</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label for="update-nom-old">Entreprise: </label>
+                            <input id="update-nom-old" name="old_nom" class="form-control" disabled>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label for="update-nom">Nom</label>
+                            <input id="update-nom" name="nom" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="update-pays">Pays</label>
+                        <select id="update-pays" name="pays" class="form-control" required>
+                            <option value selected>Choisir un pays</option>
+                            {% for pay in pays %}
+                                <option value="{{ pay }}">{{ pay }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="update-ville">Ville</label>
+                        <select id="update-ville" name="ville" class="form-control" disabled required>
+                            <option value="">Choisir d'abord le pays</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="update-adresse">Adresse</label>
+                        <select id="update-adresse" name="adresse" class="form-control" disabled required>
+                            <option value="">Choisir d'abord la ville</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label for="update-nb-employe">Nombre d'employés</label>
+                            <input id="update-nb-employe" name="nb_employe" class="form-control" type="number" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="update-ouvert" name="ouvert"
+                                   checked>
+                            <label class="custom-control-label" for="update-ouvert">Ouvert</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends "template.twig" %}
+{% block title %}
+    Etudiants
+    
+{% endblock %}
+{% block content %}
+    <h2>
+        Etudiants
+    </h2>
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">
+                    N° Etudiant                   
+                                                                                            
+                                                                
+                                    
+                </th>
+                <th scope="col">
+                    Nationalité                       
+                                                                                            
+                                                                
+                                    
+                </th>
+                <th scope="col">
+                    Remove / Add
+                                                                                            
+                                                                
+                                    
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <form action="/students/add" method="POST">
+                    <th>
+                        <input type="text" class="form-control" name="no_etu"></th>
+                        <th>
+                            <select class="custom-select" id="nat" name="nat">
+                                {% for country in countries %}
+                                    <option value="{{ country }}">
+                                        {{ country }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </th>
+                        <th>
+                            <button class="btn btn-success" type="submit">
+                                <i class="ti ti-check"></i>
+                            </button>
+                        </th>
+                    </form>
+                </tr>
+                {% for etudiant in etudiants %}
+                    <tr>
+                        <th scope="row">
+                            {{ etudiant.getNoEtu() }}
+                        </th>
+                        <td scope="row">
+                            {{ etudiant.getNationalite() }}
+                        </td>
+                        <td scope="row">
+                            <div class="d-flex">
+                                <a data-noetu="{{ etudiant.getNoEtu() }}"
+                                   data-nationalite="{{ etudiant.getNationalite() }}"
+                                    class="btn btn-danger btn-delete mr-2">
+                                    <i class="ti ti-trash"></i>
+                                </a>
+                                <button data-noetu="{{ etudiant.getNoEtu() }}" 
+                                        data-nationalite="{{ etudiant.getNationalite() }}" 
+                                        type="button" class="btn btn-info btn-update">
+                                    <i class="ti ti-pencil"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </form>
+        {{ pagination | raw }}
+    </tbody>
+</table>
+
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
+         aria-labelledby="updateModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Modification d'un étudiant</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="d-flex justify-content-between" action="/students/update" method="POST">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Numéro étudiant</label>
+                            <input id="oldnoEtu" type="text" hidden="hidden" name="oldnoEtu">
+                            <input id="noEtu" class="form-control" type="text" name="noEtu">
+                        </div>
+                        <div class="form-group">
+                            <label></label>
+                            <input id="oldnationalite" type="text" hidden="hidden" name="nationalite">
+                            <select class="custom-select" id="nationalite" name="nationalite" required>
+                                <option id="nationalite"></option>
+                                {% for country in countries %}
+                                    <option value="{{ country }}">
+                                        {{ country }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Close
+                            </button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <a id="btnDelete" class="btn btn-danger">
+                        Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const onUpdateClick = (event) => {
+            const noEtu = event.currentTarget.dataset.noetu;
+            const nationalite = event.currentTarget.dataset.nationalite;
+            //To tell the user the values he wanna change
+            document.getElementById('noEtu').value = noEtu;
+            document.getElementById('nationalite').value = nationalite;
+
+            //To have old values for the update
+            document.getElementById('oldnoEtu').value = noEtu;
+            document.getElementById('oldnationalite').value = nationalite;
+
+            $('#updateModal').modal('show')
+        }
+
+        const onDeleteClick = (event) => {
+            const noEtu = event.currentTarget.dataset.noetu;
+            const nationalite = event.currentTarget.dataset.nationalite;
+
+            const btn = document.getElementById("btnDelete");
+
+
+            btn.setAttribute("href", `/students/delete?noEtu=${encodeURI(noEtu)}&nationalite=${encodeURI(nationalite)}`);
+            document.getElementById("deleteModalLabel").innerText = `Vous allez supprimer l'étudiant: ${noEtu} venant de/du ${nationalite}`;
+            $('#deleteModal').modal('show')
+        }}
+
+
+        document.querySelectorAll('.btn-update').forEach((btn) => {
+            btn.addEventListener("click", onUpdateClick);
+        });
+
+        document.querySelectorAll('.btn-delete').forEach((btn) => {
+            btn.addEventListener("click", onDeleteClick);
+        });
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
+{% endblock %}

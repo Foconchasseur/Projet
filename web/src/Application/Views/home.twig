@@ -1,0 +1,27 @@
+{% extends "template.twig" %}
+{% block title %}Accueil{% endblock %}
+{% block content %}
+        <h2 class="text-center mb-4">Liste des 20 dernières entreprises</h2>
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">Nom</th>
+                <th scope="col">Adresse siège</th>
+                <th scope="col">Ville siège</th>
+                <th scope="col">Pays siège</th>
+                <th scope="col">Ouvert</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for enterprise in enterprises %}
+            <tr>
+                <th scope="row">{{ enterprise.getNom() }}</th>
+                <td>{{ enterprise.getSiege().getAdresse() }}</td>
+                <td>{{ enterprise.getSiege().getVille() }}</td>
+                <td>{{ enterprise.getSiege().getPays() }}</td>
+                <td>{{ enterprise.isOuvert() ? "Ouvert" : "Fermé" }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+{% endblock %}

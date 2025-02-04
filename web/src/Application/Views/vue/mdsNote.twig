@@ -1,0 +1,17 @@
+<h1>Les notes des maitres de stages</h1>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Nom</th>
+        <th>Prénom</th>
+    </tr>
+    </thead>
+    {% for note in notes %}
+        <tr>
+            <td>{{ note['nom'] }}</td>
+            <td>{{ note['prenom'] }}</td>
+            <td>{{ note['annee'] }}</td>
+            <td>{{ note['note_cumule'] }}</td>
+        </tr>
+    {% endfor %}
+</table>

@@ -1,0 +1,18 @@
+<h1>Les entreprises bloquées</h1>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Nom</th>
+        <th colspan="3">Siege</th>
+    </tr>
+    </thead>
+    {% for entreprise in entreprises %}
+        <tr>
+            <td>{{ entreprise['nom'] }}</td>
+            <td>{{ entreprise['pays_siege'] }}</td>
+            <td>{{ entreprise['ville_siege'] }}</td>
+            <td>{{ entreprise['adresse_siege'] }}</td>
+            <td>{{ entreprise['ouvert']? "Ouverte" : "Fermée" }}</td>
+        </tr>
+    {% endfor %}
+</table>

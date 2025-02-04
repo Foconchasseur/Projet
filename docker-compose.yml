@@ -1,0 +1,11 @@
+version: '3'
+services:
+  web:
+    build: "web/."
+    env_file:
+      - .env
+    restart: on-failure
+    ports:
+      - "8888:80"
+    volumes:
+      - ./web:/var/www/html/

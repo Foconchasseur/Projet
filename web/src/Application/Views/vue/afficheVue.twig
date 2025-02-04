@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.17.0/tabler-icons.min.css"/>
+    <link rel="stylesheet" href="/css/toastr.min.css">
+    <link rel="stylesheet" href="/debugbar.css"/>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="/js/toastr.min.js"></script>
+    <script src="/debugbar.js"></script>
+    
+    {{ debugbar_head|raw }}
+    <title>
+        {% block title %}{% endblock %} - Netyparneo
+    </title>
+</head>
+
+<body>
+    <header>
+        {{ include('header.twig') }}
+    </header>
+
+    {{ include('sidebar.twig') }}
+
+    <div class="content-wrapper pl-5 pt-5 pr-5">
+        {% include view %}
+    </div>
+    {{ debugbar_body|raw }}
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/adminlte.min.js"></script>
+    {% if session['error'] != null %}
+        <script>toastr.error('{{ session['error'] }}')</script>
+    {% endif %}
+    {% if session['success'] != null %}
+        <script>toastr.success('{{ session['success'] }}')</script>
+    {% endif %}
+</body>
+</html>

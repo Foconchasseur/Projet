@@ -1,0 +1,15 @@
+<h1>Les maitres de stages</h1>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Nom</th>
+        <th>Prénom</th>
+    </tr>
+    </thead>
+    {% for maitre in maitres %}
+        <tr>
+            <td>{{ maitre['nom_maitre'] }}</td>
+            <td>{{ maitre['prenom_maitre'] }}</td>
+        </tr>
+    {% endfor %}
+</table>

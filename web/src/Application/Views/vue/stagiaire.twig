@@ -1,0 +1,15 @@
+<h1>Les stagiaires</h1>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Numéro étudiant</th>
+        <th>Nationalité</th>
+    </tr>
+    </thead>
+    {% for stagiaire in stagiaires %}
+        <tr>
+            <td>{{ stagiaire['no_etu'] }}</td>
+            <td>{{ stagiaire['nationalite'] }}</td>
+        </tr>
+    {% endfor %}
+</table>

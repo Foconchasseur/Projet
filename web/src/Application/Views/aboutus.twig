@@ -1,0 +1,50 @@
+{% extends "template.twig" %}
+{% block title %}Sites{% endblock %}
+{% block content %}
+    <h2 class="text-center mb-5">A propos de nous... &#129300;</h2>
+    <img src="/picture/logo.png" alt="Our logo" class="rounded mx-auto d-block"/>
+
+    <h2 class="text-center mb-5 mt-5">Une équipe de génies  &#129299;</h2>
+    <h3 class="text-center">Notre chef de projet</h3>
+    <figure>
+        <img src="/picture/Noan.jpg" alt="Noan" class="rounded mx-auto d-block" width="800"/>
+        <figcaption class="text-center font-italic">Notre de chef de projet dans son environnement naturel, codant sont ORM</figcaption>
+    </figure>
+
+    <h3 class="text-center">Notre responsable UX/UI</h3>
+    <figure>
+        <img src="/picture/Savinien.jpg" alt="Noan" class="rounded mx-auto d-block" width="800"/>
+        <figcaption class="text-center font-italic">Notre responsable UX/UI, <strike>dormant</strike> travaillant sur le prochain design</figcaption>
+    </figure>
+
+    <h3 class="text-center">Notre reponsable base de donnée</h3>
+    <figure>
+        <img src="/picture/Francois.jpg" alt="Noan" class="rounded mx-auto d-block" width="800"/>
+        <figcaption class="text-center font-italic">Notre responsable base de donnée, confus, se demande pourquoi on ne peut pas mettre 1 million d'étudiants dans la base</figcaption>
+    </figure>
+
+    <h3 class="text-center">Notre responsable GIT</h3>
+    <figure>
+        <img src="/picture/Ewen.jpg" alt="Noan" class="rounded mx-auto d-block" width="800"/>
+        <figcaption class="text-center font-italic">Notre responsable GIT, prêt à taper sur le responsable base de donnée s'apprêtant à faire un commit dans develop</figcaption>
+    </figure>
+
+    <h2 class="text-center mb-5 mt-5">Remerciements &#128563;</h2>
+    <h3 class="text-center">Merci à OVH Lannion de nous prêter 32 serveurs pour l'hébergement du site</h3>
+    <div class="row">
+        {% for i in 0..32 %}
+        <div class="col-lg-1">
+            <img src="/picture/serveur.jpg" alt="serveur" class="rounded" width="100"/>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h3 class="text-center mt-5">Merci au gitlab de l'ENSSAT, sur lequel nous n'avons pas accès de l'exterieur</h3>
+
+    <h3 class="text-center mt-5">Merci à e926 pour le prêt le du copyright</h3>
+    <figure>
+        <img src="/picture/e926_logo.png" alt="e926_logo" class="rounded mx-auto d-block" width="200"/>
+        <figcaption class="text-center font-italic">e926 official logo</figcaption>
+    </figure>
+
+{% endblock %}

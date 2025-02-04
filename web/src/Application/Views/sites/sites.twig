@@ -1,0 +1,189 @@
+{% extends "template.twig" %}
+{% block title %}Sites{% endblock %}
+{% block content %}
+    <h1>Les sites</h1>
+    <form class="d-flex justify-content-between" action="/sites/add" method="POST">
+        <div class="form-group">
+            <label>Pays</label>
+            <select class="custom-select" id="nat" name="pays">
+                {% for country in countries %}
+                    <option value="{{ country }}">
+                        {{ country }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Ville</label>
+            <input class="form-control" type="text" name="ville">
+        </div>
+        <div class="form-group">
+            <label>Adresse</label>
+            <input class="form-control" type="text" name="adresse">
+        </div>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="flexSwitch" name="actif">
+            <label class="form-check-label" for="flexSwitch">Etat</label>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-success" type="submit">
+                <i class="ti ti-check"></i>
+            </button>
+        </div>
+    </form>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Pays</th>
+            <th>Ville</th>
+            <th>Adresse</th>
+            <th>Ouvert</th>
+            <th></th>
+        </tr>
+        </thead>
+        {% for site in sites %}
+            <tr>
+                <td>{{ site.getPays() }}</td>
+                <td>{{ site.getVille() }}</td>
+                <td>{{ site.getAdresse() }}</td>
+                <td>{{ site.isOuvert() ? "<i class=\"ti ti-check\"></i>" : "<i class=\"ti ti-x\"></i>" }}</td>
+                <td class="text-right">
+                    <a data-pays="{{ site.getPays() }}"
+                       data-ville="{{ site.getVille() }}"
+                       data-adresse="{{ site.getAdresse() }}"
+                       class="btn btn-danger btn-delete" type="submit">
+                        <i class="ti ti-trash"></i>
+                    </a>
+                    <button
+                            data-pays="{{ site.getPays() }}"
+                            data-ville="{{ site.getVille() }}"
+                            data-adresse="{{ site.getAdresse() }}"
+                            data-etat="{{ site.isOuvert() }}"
+                            type="button" class="btn btn-warning btn-update">
+                        <i class="ti ti-pencil"></i>
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
+         aria-labelledby="updateModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Modification du site</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="d-flex justify-content-between" action="/sites/update" method="POST">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Pays</label>
+                            <input id="oldPays" type="text" hidden="hidden" name="oldPays">
+                            <select class="custom-select" id="pays" name="pays">
+                                <option id="pays"></option>
+                                {% for country in countries %}
+                                    <option value="{{ country }}">
+                                        {{ country }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ville</label>
+                            <input id="oldVille" type="text" hidden="hidden" name="oldVille">
+                            <input id="ville" class="form-control" type="text" name="ville">
+                        </div>
+                        <div class="form-group">
+                            <label>Adresse</label>
+                            <input id="oldAdresse" type="text" hidden="hidden" name="oldAdresse">
+                            <input id="adresse" class="form-control" type="text" name="adresse">
+                        </div>
+                        <div class="form-check form-switch">
+
+                            <input class="form-check-input" type="checkbox" id="etat" name="etat">
+                            <label class="form-check-label" for="flexSwitch">Etat</label>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Close
+                            </button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <a id="btnDelete" class="btn btn-danger">
+                        Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const onUpdateClick = (event) => {
+            const pays = event.currentTarget.dataset.pays;
+            const ville = event.currentTarget.dataset.ville;
+            const adresse = event.currentTarget.dataset.adresse;
+            const etat = !!event.currentTarget.dataset.etat;
+
+            //To tell the user the values he wanna change
+            document.getElementById('pays').value = pays;
+            document.getElementById('ville').value = ville;
+            document.getElementById('adresse').value = adresse;
+            document.getElementById('etat').checked = etat;
+
+            //To have old values for the update
+            document.getElementById('oldPays').value = pays;
+            document.getElementById('oldVille').value = ville;
+            document.getElementById('oldAdresse').value = adresse;
+
+            $('#updateModal').modal('show')
+        }
+
+        const onDeleteClick = (event) => {
+            const pays = event.currentTarget.dataset.pays;
+            const ville = event.currentTarget.dataset.ville;
+            const adresse = event.currentTarget.dataset.adresse;
+
+            const btn = document.getElementById("btnDelete");
+
+
+            btn.setAttribute("href", `/sites/delete?pays=${encodeURI(pays)}&ville=${encodeURI(ville)}&adresse=${encodeURI(adresse)}`);
+            document.getElementById("deleteModalLabel").innerText = `Vous allez supprimer le site: ${pays} ${ville} ${adresse}`;
+            $('#deleteModal').modal('show')
+        }
+
+
+        document.querySelectorAll('.btn-update').forEach((btn) => {
+            btn.addEventListener("click", onUpdateClick);
+        });
+        document.querySelectorAll('.btn-delete').forEach((btn) => {
+            btn.addEventListener("click", onDeleteClick);
+        });
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
+
+{% endblock %}

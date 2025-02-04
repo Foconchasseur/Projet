@@ -1,0 +1,15 @@
+<h1>Les Vacataires</h1>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Nom</th>
+        <th>Prénom</th>
+    </tr>
+    </thead>
+    {% for vacataire in vacataires %}
+        <tr>
+            <td>{{ vacataire['nom_vacataire'] }}</td>
+            <td>{{ vacataire['prenom_vacataire'] }}</td>
+        </tr>
+    {% endfor %}
+</table>

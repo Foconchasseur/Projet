@@ -1,0 +1,368 @@
+{% extends "template.twig" %}
+{% block title %}Sites{% endblock %}
+{% block content %}
+    <div class="d-flex justify-content-between">
+        <h1>Contrats de vacations</h1>
+        <button class="btn btn-success" id="btn-add" type="button">Creer un contrat</button>
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Vacataire</th>
+            <th>Entreprise</th>
+            <th>Date de début</th>
+            <th>Date de fin prévue</th>
+            <th>Fin anticipée</th>
+            <th>Note</th>
+            <td></td>
+        </tr>
+        </thead>
+        {% for contratVacataire in contratVacataires %}
+            <tr>
+                <td>{{ contratVacataire.getVacataire().getNom() }} {{ contratVacataire.getVacataire().getPrenom() }}</td>
+                <td>{{ contratVacataire.getEntreprise().getNom() }}</td>
+                <td>{{ contratVacataire.getDateDebut() }}</td>
+                <td>{{ contratVacataire.getDateFin() }}</td>
+                <td>{{ contratVacataire.getDateFinAnticipe() ? contratVacataire.getDateFinAnticipe() : "-" }}</td>
+                <td>{{ contratVacataire.getNote() == -1 ? "-" : contratVacataire.getNote() ~ '/10' }}</td>
+                <td class="text-right">
+                    <button
+                            data-date="{{ contratVacataire.getDateDebut() }}"
+                            data-nom="{{ contratVacataire.getVacataire().getNom() }}"
+                            data-prenom="{{ contratVacataire.getVacataire().getPrenom() }}"
+                            data-date_fin="{{ contratVacataire.getDateFin() }}"
+                            data-date_fin_ant="{{ contratVacataire.getDateFinAnticipe() }}"
+                            data-note="{{ contratVacataire.getNote() }}"
+                            data-entreprise="{{ contratVacataire.getEntreprise().getNom() }}"
+                            data-pays="{{ contratVacataire.getSite().getPays() }}"
+                            data-ville="{{ contratVacataire.getSite().getVille() }}"
+                            data-adresse="{{ contratVacataire.getSite().getAdresse() }}"
+                            type="button" class="btn btn-primary btn-detail">
+                        <i class="ti ti-eye"></i>
+                    </button>
+                    <a data-date="{{ contratVacataire.getDateDebut() }}"
+                       data-nom="{{ contratVacataire.getVacataire().getNom() }}"
+                       data-prenom="{{ contratVacataire.getVacataire().getPrenom() }}"
+                       class="btn btn-danger btn-delete" type="submit">
+                        <i class="ti ti-trash"></i>
+                    </a>
+                    <button
+                            data-date="{{ contratVacataire.getDateDebut() }}"
+                            data-nom="{{ contratVacataire.getVacataire().getNom() }}"
+                            data-prenom="{{ contratVacataire.getVacataire().getPrenom() }}"
+                            data-date_fin="{{ contratVacataire.getDateFin() }}"
+                            data-date_fin_ant="{{ contratVacataire.getDateFinAnticipe() }}"
+                            data-note="{{ contratVacataire.getNote() }}"
+                            data-entreprise="{{ contratVacataire.getEntreprise().getNom() }}"
+                            data-pays="{{ contratVacataire.getSite().getPays() }}"
+                            data-ville="{{ contratVacataire.getSite().getVille() }}"
+                            data-adresse="{{ contratVacataire.getSite().getAdresse() }}"
+                            type="button" class="btn btn-warning btn-update">
+                        <i class="ti ti-pencil"></i>
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog"
+         aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Détails du contrat</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <h4>Vacataire</h4>
+                        <p id="detailVacataire"></p>
+                    </div>
+                    <div>
+                        <h4>Entreprise</h4>
+                        <p id="detailEntreprise"></p>
+                    </div>
+                    <div>
+                        <h4>Date de début</h4>
+                        <p id="detailDateDebut"></p>
+                        <h4>Date de fin</h4>
+                        <p id="detailDateFin"></p>
+                        <h4>Date de fin anticipée</h4>
+                        <p id="detailDateFinAnt"></p>
+                    </div>
+                    <div>
+                        <h4>Site</h4>
+                        <p id="detailSite"></p>
+                    </div>
+                    <div>
+                        <h4>Note</h4>
+                        <p id="detailNote"></p>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Fermer
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
+         aria-labelledby="updateModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Modification du contrat</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="/contratVacataire/update" method="POST">
+                    <input hidden="hidden" id="oldNom" name="oldNom">
+                    <input hidden="hidden" id="oldPrenom" name="oldPrenom">
+                    <input hidden="hidden" id="oldDate" name="oldDate">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="vacataire">Vacataire</label>
+                            <select class="custom-select" id="vacataire" name="vacataire">
+                                <option id="updateVacataire"></option>
+                                {% for vacataire in vacataires %}
+                                    <option value="{{ vacataire.getNom()~";"~vacataire.getPrenom() }}">
+                                        {{ vacataire.getNom()~";"~vacataire.getPrenom() }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="entreprise">Entreprise</label>
+                            <select class="custom-select" id="entreprise" name="Entreprise">
+                                <option id="updateEntreprise"></option>
+                                {% for entreprise in entreprises %}
+                                    <option value="{{ entreprise.getNom() }}">
+                                        {{ entreprise.getNom() }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateDateDeb">Date de début</label>
+                            <input id="updateDateDeb" class="form-control" type="date" name="dateDeb">
+                            <label for="updateDateFin">Date de fin</label>
+                            <input id="updateDateFin" class="form-control" type="date" name="dateFin">
+                            <label for="updateDateFinAnt">Date de fin anticipée</label>
+                            <input id="updateDateFinAnt" class="form-control" type="date" name="dateFinAnt">
+                        </div>
+                        <div class="form-group">
+                            <label for="site">Site</label>
+                            <select class="custom-select" id="site" name="site">
+                                <option id="updateSite"></option>
+                                {% for site in sites %}
+                                    <option value="{{ site.getPays()~";"~site.getVille()~";"~site.getAdresse() }}">
+                                        {{ site.getPays()~";"~site.getVille()~";"~site.getAdresse() }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateNote">Note</label>
+                            <input type="number" max="10" min="0" class="form-control" id="updateNote" name="note">
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            Fermer
+                        </button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+         aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">Ajout d'un contrat</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="/contratVacataire/add" method="POST">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="vacataire">Vacataire <em>Obligatoire</em></label>
+                            <select class="custom-select" id="addVacataire" name="vacataire">
+                                {% for vacataire in vacataires %}
+                                    <option value="{{ vacataire.getNom()~";"~vacataire.getPrenom() }}">
+                                        {{ vacataire.getNom()~";"~vacataire.getPrenom() }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="entreprise">Entreprise <em>Obligatoire</em></label>
+                            <select class="custom-select" id="entreprise" name="Entreprise">
+                                {% for entreprise in entreprises %}
+                                    <option value="{{ entreprise.getNom() }}">
+                                        {{ entreprise.getNom() }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="addDateDeb">Date de début <em>Obligatoire</em></label>
+                            <input id="addDateDeb" class="form-control" type="date" name="dateDeb">
+                            <label for="addDateFin">Date de fin <em>Obligatoire</em></label>
+                            <input id="addDateFin" class="form-control" type="date" name="dateFin">
+                            <label for="addDateFinAnt">Date de fin anticipée</label>
+                            <input id="addDateFinAnt" class="form-control" type="date" name="dateFinAnt">
+                        </div>
+                        <div class="form-group">
+                            <label for="site">Site <em>Obligatoire</em></label>
+                            <select class="custom-select" id="site" name="site">
+                                {% for site in sites %}
+                                    <option value="{{ site.getPays()~";"~site.getVille()~";"~site.getAdresse() }}">
+                                        {{ site.getPays()~";"~site.getVille()~";"~site.getAdresse() }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="addNote">Note</label>
+                            <input type="number" max="10" min="0" class="form-control" id="addNote" name="note">
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            Fermer
+                        </button>
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <a id="btnDelete" class="btn btn-danger">
+                        Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const onDetailClick = (event) => {
+            const nom = event.currentTarget.dataset.nom;
+            const prenom = event.currentTarget.dataset.prenom;
+            const dateDebut = event.currentTarget.dataset.date;
+            const dateFin = event.currentTarget.dataset.date_fin;
+            const dateFinAnticipe = event.currentTarget.dataset.date_fin_ant;
+            const entreprise = event.currentTarget.dataset.entreprise;
+            const pays = event.currentTarget.dataset.pays;
+            const ville = event.currentTarget.dataset.ville;
+            const adresse = event.currentTarget.dataset.adresse;
+            const note = event.currentTarget.dataset.note;
+
+            document.getElementById('detailSite').innerText = (pays + " " + ville + " " + adresse);
+            document.getElementById('detailNote').innerText = ((note !== "-1") ? note + "/10" : "-");
+            document.getElementById('detailVacataire').innerText = prenom + " " + nom;
+            document.getElementById('detailEntreprise').innerText = entreprise;
+            document.getElementById('detailDateDebut').innerText = dateDebut;
+            document.getElementById('detailDateFin').innerText = dateFin;
+            document.getElementById('detailDateFinAnt').innerText = dateFinAnticipe ? dateFinAnticipe : "-";
+
+            $('#detailModal').modal('show');
+        }
+
+        const onUpdateClick = (event) => {
+            const nom = event.currentTarget.dataset.nom;
+            const prenom = event.currentTarget.dataset.prenom;
+            const dateDebut = event.currentTarget.dataset.date;
+            const dateFin = event.currentTarget.dataset.date_fin;
+            const dateFinAnticipe = event.currentTarget.dataset.date_fin_ant;
+            const entreprise = event.currentTarget.dataset.entreprise;
+            const pays = event.currentTarget.dataset.pays;
+            const ville = event.currentTarget.dataset.ville;
+            const adresse = event.currentTarget.dataset.adresse;
+            const note = event.currentTarget.dataset.note;
+
+            const site = pays + ";" + ville + ";" + adresse;
+            //To tell the user the values he wanna change
+            const updateVac = document.getElementById('updateVacataire');
+            updateVac.value = nom + ";" + prenom;
+            updateVac.innerText = nom + ";" + prenom;
+            document.getElementById('updateDateDeb').value = dateDebut;
+            document.getElementById('updateDateFin').value = dateFin;
+            document.getElementById('updateDateFinAnt').value = dateFinAnticipe;
+            const updateEntreprise = document.getElementById('updateEntreprise')
+            updateEntreprise.innerText  = entreprise;
+            updateEntreprise.value = entreprise;
+            const updateSite = document.getElementById('updateSite');
+            updateSite.value = site;
+            updateSite.innerText = site;
+            document.getElementById('updateNote').value = note !== "-1" ? note : "";
+
+            document.getElementById('oldPrenom').value = prenom;
+            document.getElementById('oldNom').value = nom;
+            document.getElementById('oldDate').value = dateDebut;
+
+            $('#updateModal').modal('show')
+        }
+
+        const onDeleteClick = (event) => {
+            const date = event.currentTarget.dataset.date;
+            const prenom = event.currentTarget.dataset.prenom;
+            const nom = event.currentTarget.dataset.nom;
+
+            const btn = document.getElementById("btnDelete");
+
+
+            btn.setAttribute("href", `/contratVacataire/delete?date=${encodeURI(date)}&nom=${encodeURI(nom)}&prenom=${encodeURI(prenom)}`);
+            document.getElementById("deleteModalLabel").innerText = `Vous allez supprimer le contrat de: ${nom} ${prenom} avec pour date de début ${date}`;
+            $('#deleteModal').modal('show')
+        }
+
+        const onAddClick = (event) => {
+            $('#addModal').modal('show')
+        }
+
+
+        document.querySelectorAll('.btn-update').forEach((btn) => {
+            btn.addEventListener("click", onUpdateClick);
+        });
+        document.querySelectorAll('.btn-delete').forEach((btn) => {
+            btn.addEventListener("click", onDeleteClick);
+        });
+        document.querySelectorAll('.btn-detail').forEach((btn) => {
+            btn.addEventListener("click", onDetailClick);
+        });
+
+        document.getElementById('btn-add').addEventListener("click", onAddClick);
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
+
+{% endblock %}

@@ -1,0 +1,25 @@
+<h1>Les entreprises partenaire et leurs nombres de contrat</h1>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Nom</th>
+        <th>Total</th>
+        <th>Stage</th>
+        <th>Alternance</th>
+        <th>Vacataire</th>
+        <th>Laboratoire</th>
+        <th>Donation</th>
+    </tr>
+    </thead>
+    {% for entreprise in entreprises %}
+        <tr>
+            <td>{{ entreprise['nom'] }}</td>
+            <td>{{ entreprise['nb_total'] }}</td>
+            <td>{{ entreprise['nb_stage'] }}</td>
+            <td>{{ entreprise['nb_alternance'] }}</td>
+            <td>{{ entreprise['nb_vacataire'] }}</td>
+            <td>{{ entreprise['nb_labo'] }}</td>
+            <td>{{ entreprise['nb_donation'] }}</td>
+        </tr>
+    {% endfor %}
+</table>

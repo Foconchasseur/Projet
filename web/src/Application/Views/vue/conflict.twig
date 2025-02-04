@@ -1,0 +1,17 @@
+<h1>Les contrats avec fin anticipée</h1>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Année</th>
+        <th>Type</th>
+        <th>Entreprise</th>
+    </tr>
+    </thead>
+    {% for contrats in contrats %}
+        <tr>
+            <td>{{ contrats['annee'] }}</td>
+            <td>{{ contrats['type'] }}</td>
+            <td>{{ contrats['entreprise'] }}</td>
+        </tr>
+    {% endfor %}
+</table>

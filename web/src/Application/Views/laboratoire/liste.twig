@@ -1,0 +1,153 @@
+{% extends "template.twig" %}
+ {% block head %}
+
+     <script>
+         function onContentLoaded(event) {
+             document.querySelector('#add-btn').addEventListener('click', onAddClick);
+             document.querySelectorAll('.delete-btn').forEach(element => element.addEventListener('click', onDeleteClick));
+             document.querySelectorAll('.update-btn').forEach(element => element.addEventListener('click', onUpdateClick));
+             document.querySelector('#update-form').addEventListener('submit', onFormSubmit);
+         }
+
+         function onAddClick(event) {
+             let nom_input = document.querySelector("#add-nom");
+             let url = "add?nom=" + encodeURI(nom_input.value);
+             fetch(url, {method: "GET",})
+                 .then((response) => response.json())
+                 .then((data) => {
+                     switch (data['error']) {
+                         case true:
+                             toastr.error("erreur: " + data['message']);
+                             break;
+                         case false:
+                             nom_input.value = '';
+                             document.location.reload();
+                             break;
+                     }
+                 }).catch((err) => {
+                 toastr.error("Une erreur est survenue lors de l'enregistrement du laboratoire")
+             });
+         }
+
+         function onDeleteClick(event) {
+             let nom = event.target.dataset.id
+             if (nom === undefined) nom = event.target.parentElement.dataset.id
+             let url = "delete?nom=" + encodeURI(nom);
+
+             fetch(url, {method: "GET",})
+                 .then((response) => response.json())
+                 .then((data) => {
+                     switch (data['error']) {
+                         case true:
+                             toastr.error("erreur: " + data['message']);
+                             break;
+                         case false:
+                             document.location.reload();
+                             break;
+                     }
+                 }).catch((err) => toastr.error("Une erreur est survenue lors de la suppression du laboratoire"));
+         }
+
+         function onUpdateClick(event) {
+             let nom = event.target.dataset.id;
+             if (nom === undefined) nom = event.target.parentElement.dataset.id
+
+             document.querySelector('#update-nom-old').value = nom;
+             document.querySelector('#update-nom-new').value = nom;
+
+             $('#update-modal').modal('show')
+         }
+
+         function onFormSubmit(event) {
+             event.preventDefault();
+             let form = document.querySelector('#update-form');
+             let disabled_inputs = form.querySelectorAll('input[disabled]');
+
+             disabled_inputs.forEach(element => {
+                 element.removeAttribute('disabled');
+             });
+             let data = new FormData(event.target);
+             disabled_inputs.forEach(element => {
+                 element.setAttribute('disabled', 'true');
+             });
+
+             if (data.get('nom_old') === data.get('nom_new')) {
+                 toastr.info("Le nouveau nom est le même que l'ancien.")
+                 return;
+             }
+
+             let url = "update?old_nom=" + encodeURI(data.get('nom_old'));
+             url += "&new_nom=" + encodeURI(data.get('nom_new'));
+             fetch(url, {method: "GET",})
+                 .then((response) => response.json())
+                 .then((data) => {
+                     switch (data['error']) {
+                         case true:
+                             toastr.error("erreur: " + data['message']);
+                             break;
+                         case false:
+                             document.location.reload();
+                             break;
+                     }
+                 }).catch((err) => {
+                 toastr.error("Une erreur est survenue lors de la suppression du laboratoire")
+             });
+         }
+
+
+         addEventListener("DOMContentLoaded", onContentLoaded)
+     </script>
+ {% endblock %}
+ {% block title %}Laboratoire{% endblock %}
+ {% block content %}
+     <h2>Les laboratoires</h2>
+     <div class="m-4">
+         <table class="table">
+             <tr>
+                 <td class="text-center"><label for="add-nom">Nom</label> <input type="text" id="add-nom"></td>
+                 <td class="text-right">
+                     <button class="btn btn-success " id="add-btn"><i class="ti ti-plus"></i></button>
+                 </td>
+             </tr>
+             {% for laboratoire in laboratoires %}
+                 <tr>
+                     <td>{{ laboratoire.nom }}</td>
+                     <td class="text-right">
+                         <button class="btn btn-danger delete-btn" data-id="{{ laboratoire.nom }}">
+                             <i class="ti ti-trash"></i>
+                         </button>
+                         <button class="btn btn-info update-btn" data-id="{{ laboratoire.nom }}">
+                             <i class="ti ti-pencil"></i>
+                         </button>
+                     </td>
+                 </tr>
+             {% endfor %}
+         </table>
+     </div>
+
+     <div class="modal" tabindex="-1" role="dialog" id="update-modal">
+         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+             <form id="update-form" class="modal-content">
+                 <div class="modal-header">
+                     <h5 class="modal-title">Modifier un laboratoire</h5>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                         <span aria-hidden="true">&times;</span>
+                     </button>
+                 </div>
+                 <div class="modal-body">
+                     <div class="input-group form-row mb-2">
+                         <label for="update-nom-old" class="col">Ancien nom</label>
+                         <input name="nom_old" class="form-control col" id="update-nom-old" disabled>
+                     </div>
+                     <div class="input-group form-row">
+                         <label for="update-nom-new" class="col">Nouveau nom</label>
+                         <input name="nom_new" class="form-control col" id="update-nom-new">
+                     </div>
+                 </div>
+                 <div class="modal-footer">
+                     <button type="submit" class="btn btn-primary">Enregistrer</button>
+                 </div>
+             </form>
+         </div>
+     </div>
+ {% endblock %}

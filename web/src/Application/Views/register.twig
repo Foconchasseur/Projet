@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Inscription - Netyparneo</title>
+</head>
+<body>
+    <div class="bg-slate-100 w-screen h-screen">
+        <div class="bg-white rounded-xl absolute left-1/2 top-1/2 h-auto w-2/3 lg:w-1/3 shadow-md -translate-x-1/2 -translate-y-1/2">
+            <h2 class="text-center rounded-t-xl bg-blue-700 font-semibold py-6 text-2xl uppercase text-white">S'inscrire</h2>
+            <div class="p-8">
+                {% if session['error'] != null %}
+                    <div class="bg-red-500 text-white text-center p-4 rounded mb-6">
+                        <p>
+                            {{ session['error'] }}
+                        </p>
+                    </div>
+                {% endif %}
+                <form method="post">
+                    <div class="flex mb-6">
+                        <div class="mr-2">
+                            <p class="mb-2 text-sm text-slate-500">Prénom</p>
+                            <input name="surname" type="text" placeholder="John" class="py-2 px-2 w-full rounded-md shadow-sm border-gray-300 border-2"/>
+                        </div>
+                        <div class="ml-2">
+                            <p class="mb-2 text-sm text-slate-500">Nom</p>
+                            <input name="name" type="text" placeholder="Doe" class="py-2 px-2 w-full rounded-md shadow-sm border-gray-300 border-2"/>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <p class="mb-2 text-sm text-slate-500">Nom d'utilisateur</p>
+                        <input name="username" type="text" class="py-2 px-2 w-full rounded-md shadow-inner border-gray-300 border-2"/>
+                    </div>
+                    <div class="mb-8">
+                        <p class="mb-2 text-sm text-slate-500">Mot de passe</p>
+                        <input name="password" type="password" placeholder="*************" class="py-2 px-2 w-full rounded-md shadow-sm border-gray-300 border-2"/>
+                    </div>
+                    <div class="mb-8">
+                        <p class="mb-2 text-sm text-slate-500">Confirmation mot de passe</p>
+                        <input name="repassword" type="password" placeholder="*************" class="py-2 px-2 w-full rounded-md shadow-sm border-gray-300 border-2"/>
+                    </div>
+                    <div class="flex flex-row-reverse items-center">
+                        <button class="bg-blue-700 hover:bg-blue-800 transition-all text-slate-100 px-4 py-2 rounded-md uppercase shadow-md text-sm">Je m'inscris</button>
+                        <a href="/login" class="mr-8 text-slate-500 underline">T'as les cramptés ?</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

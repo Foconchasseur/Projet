@@ -1,0 +1,21 @@
+<h1>Les Laboratoires et leurs contrats</h1>
+    {% for nom, laboratoire in laboratoires %}
+        <h2>{{ nom }}</h2>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Entreprise</th>
+                <th>Début</th>
+                <th>Fin</th>
+            </tr>
+            </thead>
+                {% for contrat in laboratoire %}
+                    <tr>
+                        <td>{{ contrat['entreprise'] }}</td>
+                        <td>{{ contrat['date_debut'] }}</td>
+                        <td>{{ contrat['date_fin_anticipe']??contrat['date_fin'] }}</td>
+                        <td>{{ contrat['date_fin_anticipe'] }}</td>
+                    </tr>
+                {% endfor %}
+        </table>
+    {% endfor %}
