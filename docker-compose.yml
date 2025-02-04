@@ -1,7 +1,9 @@
 version: '3'
 services:
   web:
-    build: "web/."
+    build:
+      context: "web/."
+      network: "host"  # Add this line
     env_file:
       - .env
     restart: on-failure
