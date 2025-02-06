@@ -21,12 +21,12 @@ class Database extends \PDO
         $driver     = $database_settings['driver'];
         $user       = $database_settings['user'];
         $password   = $database_settings['password'];
-        $host       = $database_settings['host'];
+        $hoste       = $database_settings['host'];
         $name       = $database_settings['dbname'];
         $port       = $database_settings['port'];
 
         try{
-            parent::__construct("$driver:host=$host;dbname=$name;port=$port", $user, $password);
+            parent::__construct("$driver:host=$hoste;dbname=$name;port=$port", $user, $password);
         }catch (Exception $e) {
             throw new Exception("Error connection to database: ".$e->getMessage());
         }
