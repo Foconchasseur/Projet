@@ -24,7 +24,7 @@ return function (ContainerBuilder $containerBuilder) {
                 'debug_bar' => false,
                 'database' => [
                     'driver' => 'pgsql',
-                    'host' => '192.168.44.254',
+                    'host' => 'db',
                     'dbname' => 'netyparneo',
                     'port' => 5432,
                     'user' => 'postgres',
