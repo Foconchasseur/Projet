@@ -41,10 +41,6 @@ $dependencies($containerBuilder);
 $repositories = require __DIR__ . '/../app/repositories.php';
 $repositories($containerBuilder);
 
-$containerBuilder->addDefinitions([
-    'host' => '192.168.44.254'
-])
-
 // Build PHP-DI Container instance
 $container = $containerBuilder->build();
 
