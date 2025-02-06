@@ -3,10 +3,8 @@ services:
   web:
     build:
       context: "web/."
-      network: "host"  # Add this line
     env_file:
       - .env
     restart: on-failure
-    network_mode: "host"
     volumes:
       - ./web:/var/www/html/
