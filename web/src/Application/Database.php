@@ -26,8 +26,7 @@ class Database extends \PDO
         $port       = $database_settings['port'];
 
         try{
-            $dsn = "$driver:host=$host;dbname=$name;port=$port";
-            parent::__construct($dsn, $user, $password);
+            parent::__construct("$driver:host=$host;dbname=$name;port=$port", $user, $password);
         }catch (Exception $e) {
             throw new Exception("Error connection to database: ".$e->getMessage());
         }
